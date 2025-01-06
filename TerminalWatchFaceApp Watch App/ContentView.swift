@@ -18,7 +18,7 @@ struct WatchFaceView: View {
     @State private var currentDate = getCurrentDate()
     @State private var batteryLevel: String = "Loading..."
     @State private var stepsCount: String = "0 steps"
-    @State private var heartRate: String = "Loading..."
+    @State private var heartRate: String = "0, u r dying"
     @State private var temperature: String = "Loading..."
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -30,7 +30,7 @@ struct WatchFaceView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("user@watch:~ $ now")
                     .foregroundColor(.white)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(adaptiveFont())
                 
                 Group {
                     createTerminalLine(label: "[TIME]", value: currentTime, valueColor: .white)
@@ -45,7 +45,7 @@ struct WatchFaceView: View {
                 
                 Text("user@watch:~ $")
                     .foregroundColor(.white)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(adaptiveFont())
             }
             .padding()
             .onAppear {
@@ -64,12 +64,23 @@ struct WatchFaceView: View {
         HStack {
             Text(label)
                 .foregroundColor(.white)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(adaptiveFont())
+                .lineLimit(1)
+            
             Text(value)
                 .foregroundColor(valueColor)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(adaptiveFont())
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+            
             Spacer()
         }
+    }
+    
+    func adaptiveFont() -> Font {
+        let screenWidth = WKInterfaceDevice.current().screenBounds.width
+        let size: CGFloat = screenWidth <= 200 ? 12 : 14
+        return Font.system(size: size, weight: .medium, design: .monospaced)
     }
     
     func fetchBatteryLevel() {
